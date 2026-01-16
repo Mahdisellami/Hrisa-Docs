@@ -1,0 +1,111 @@
+# Hrisa Docs - AI Generation Prompts
+# Copy-paste these into DALL-E, Midjourney, or Stable Diffusion
+# Generate 2-3 variations of each, then review together
+
+================================================================================
+DIRECTION A: SPICY DOCUMENTS
+================================================================================
+
+[A1 - Single Chili Diagonal]
+App icon design, minimalist flat design, white document paper with folded corner, bold red Tunisian chili pepper crossing diagonally, clean vector style, professional, modern, red and white color scheme, sharp edges, suitable for app icon 1024x1024, centered composition, icon design for document processing app
+
+[A2 - Chili Bookmarks]
+App icon, three red chili peppers as bookmarks on white document edge, flat design, minimal style, vector illustration, professional tech app icon, red peppers #C62828, white paper #FAFAFA, clean modern aesthetic, 1024x1024 icon design, centered, simple geometric shapes
+
+[A3 - Document Stack with Chili Spine]
+App icon, stack of white document papers with red Tunisian chili pepper as binding spine, flat design vector style, professional modern, red #C62828 and white #FAFAFA, clean minimalist, 1024x1024 app icon, centered composition
+
+[A4 - Circular Document + Chili]
+Circular app icon, white document pages radiating around central red Tunisian chili pepper, flat design, modern professional, red and white color scheme, clean vector style, 1024x1024, simple memorable design
+
+================================================================================
+DIRECTION B: TUNISIAN SCHOLAR
+================================================================================
+
+[B1 - Chechia with Scroll]
+App icon design, Tunisian Chechia traditional red hat, document scroll emerging from top, flat design vector style, professional academic theme, red hat #C62828, white paper scroll, gold tassel accent, clean modern icon, cultural authenticity, 1024x1024 app icon, centered composition, minimalist elegant
+
+[B2 - Chechia Cutaway]
+App icon, side view red Tunisian Chechia with white document pages visible inside, cutaway silhouette effect, modern flat design, cultural fusion, red #C62828 and white #FAFAFA, professional tech icon, simple geometric shapes, 1024x1024, app icon design
+
+[B3 - Circular Chechia Badge]
+Circular badge app icon, centered red Tunisian Chechia, white document border pattern, professional cultural design, flat vector style, red #C62828, gold #D4AF37 accents, 1024x1024, clean modern
+
+[B4 - Geometric Chechia]
+App icon, abstract geometric Tunisian Chechia shape filled with document page texture, modern flat design, red and white, professional tech aesthetic, 1024x1024, bold memorable
+
+================================================================================
+DIRECTION C: ABSTRACT HEAT
+================================================================================
+
+[C1 - Hexagon Chili Pattern]
+Modern geometric app icon, abstract hexagon shape, stylized angular chili pepper pattern inside, document lines texture, flat design vector, bold red #D32F2F and white #FFFFFF, minimalist tech aesthetic, clean sharp edges, professional, 1024x1024 app icon, centered, simple memorable design
+
+[C2 - Flame Document]
+Abstract tech app icon, geometric flame or heat waves forming document rectangle, angular modern design, red gradient #D32F2F to #B71C1C, white accent lines, flat vector style, professional tech company icon, 1024x1024 square, clean minimalist, bold memorable silhouette
+
+[C3 - Overlapping Geometric]
+App icon, overlapping geometric shapes representing chili and document, abstract modern, angular clean design, red #D32F2F and white #FFFFFF, flat vector style, tech aesthetic, 1024x1024, professional minimalist
+
+[C4 - Radiating Heat Badge]
+Circular app icon, radiating heat lines from center, document grid pattern overlay, modern geometric, red and white, flat design vector, professional tech icon, 1024x1024, bold simple
+
+================================================================================
+DIRECTION D: HARISSA BRAND
+================================================================================
+
+[D1 - Circular Label]
+Circular badge app icon, hand-drawn Tunisian chili pepper illustration, vintage label design, artisanal authentic style, red chili #C62828 on cream background #FAF3E0, dark ink outlines, traditional spice label aesthetic, text "Hrisa Docs" integrated, 1024x1024 app icon, clean enough for small sizes, professional artisanal
+
+[D2 - Vintage Label Border]
+Vintage spice label app icon, hand-drawn red chili pepper center, ornate border pattern with document/book motifs, traditional Tunisian packaging style, red and cream colors, artisanal authentic design, clean vector illustration, 1024x1024 square icon, readable at small sizes
+
+[D3 - Hand-drawn Chili Simple]
+App icon, simple hand-drawn Tunisian chili pepper illustration, document texture background, artisanal style, red #C62828 on cream #FAF3E0, clean enough for icon, traditional authentic, 1024x1024, professional
+
+[D4 - Chili with Ribbon]
+App icon, hand-drawn red chili pepper with decorative ribbon banner, text "Hrisa Docs", vintage label style, artisanal authentic, red and cream colors, clean vector design, 1024x1024, traditional modern fusion
+
+================================================================================
+MINIMALIST EXTRAS
+================================================================================
+
+[E - Single Chili Only]
+Minimalist app icon, single red Tunisian chili pepper silhouette, clean simple shape, bold red #C62828, white background, flat design, maximum simplicity, instantly recognizable, 1024x1024 app icon, centered, vector style
+
+[F - Document + Corner Chili]
+Clean app icon, white document page with folded corner, small red Tunisian chili accent in corner, minimalist professional, red #C62828 and white #FAFAFA, flat design vector, 1024x1024 app icon, simple memorable, tech aesthetic
+
+================================================================================
+GENERATION TIPS
+================================================================================
+
+For DALL-E:
+- Use these prompts as-is
+- Generate 2-4 variations by clicking "Generate again"
+- Save all outputs even if not perfect
+- Can iterate with "Make the chili more curved" etc.
+
+For Midjourney:
+- Add "--ar 1:1" at the end for square
+- Add "--style raw" for more literal interpretation
+- Try "--stylize 250" for cleaner icons
+- Use "/imagine" command before prompt
+
+For Stable Diffusion:
+- Add "vector art, flat design, icon" to beginning
+- Use negative prompt: "3d, realistic, photo, blur, noise"
+- Use PNG output for transparency
+
+================================================================================
+WHAT TO DO NEXT
+================================================================================
+
+1. Choose 3-4 prompts that excite you most
+2. Generate with your AI tool
+3. Save all results to: design/concepts/
+4. Review together - pick top 3-5
+5. Refine winners in Figma/Inkscape
+6. Test at all icon sizes
+
+Start with Direction A (Spicy Documents) - easiest to execute!

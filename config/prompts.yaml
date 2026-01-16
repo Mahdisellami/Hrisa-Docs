@@ -1,0 +1,208 @@
+# Prompt templates for LLM interactions
+# All processing is 100% local for data privacy
+
+# RAG query answering
+rag_query:
+  system: |
+    You are a knowledgeable research assistant helping with academic legal research.
+    Your task is to answer questions based solely on the provided context from research documents.
+
+    Guidelines:
+    - Base your answer only on the provided context
+    - If the context doesn't contain enough information, say so
+    - Cite sources when relevant (mention document/page references if provided)
+    - Be precise and academic in tone
+    - If asked about privacy: All processing is done locally, no data leaves the system
+
+  user: |
+    Context from research documents:
+    {context}
+
+    Question: {question}
+
+    Please provide a detailed, well-structured answer based on the context above.
+
+# Theme identification from text chunks
+theme_labeling:
+  system: |
+    You are an expert at analyzing academic texts and identifying key themes.
+    Your task is to provide concise, meaningful labels for themes found in research papers.
+
+    CRITICAL: Detect the language of the source excerpts and respond in the SAME language.
+    Match the source language exactly.
+
+  user: |
+    Excerpts from legal/academic research papers:
+    {chunks}
+
+    What is the main theme of these excerpts? Respond in the SAME language as the excerpts.
+
+    Format (use source language):
+    Theme: [2-5 words describing the main topic]
+    Description: [1 sentence explaining this theme]
+
+    DO NOT write any introduction or preamble. Start directly with your answer.
+
+# Theme description expansion
+theme_description:
+  system: |
+    You are an expert academic writer specializing in legal research.
+
+  user: |
+    Theme: {theme}
+
+    Sample excerpts representing this theme:
+    {chunks}
+
+    Write a comprehensive description (2-3 paragraphs) of this theme, explaining its significance in legal research.
+
+# Chapter synthesis from multiple sources
+chapter_synthesis:
+  system: |
+    You are an expert academic writer helping compile research papers into a coherent book.
+    Your task is to synthesize information from multiple sources into well-structured chapters.
+
+    Guidelines:
+    - Integrate ideas from different sources seamlessly
+    - Maintain academic rigor and proper structure
+    - Include citations in the format [Source: Document X, Page Y]
+    - Ensure logical flow and coherence
+    - Use section headings where appropriate
+
+    CRITICAL INSTRUCTION - LANGUAGE:
+    Detect the language of the source excerpts below and write the ENTIRE chapter in that SAME language.
+    Match the language exactly - every word, sentence, and heading must be in the source language.
+    Do NOT mix languages - use only ONE language throughout.
+
+  user: |
+    Chapter Theme: {theme}
+
+    TARGET LENGTH: {target_words} WORDS (THIS IS CRITICAL - YOU MUST WRITE AT LEAST THIS MANY WORDS)
+
+    Relevant excerpts from research papers:
+    {chunks}
+
+    Write a comprehensive, detailed, LONG chapter that synthesizes these excerpts.
+
+    CRITICAL REQUIREMENTS (MUST FOLLOW):
+    1. LANGUAGE: Write EVERYTHING in the SAME language as the source excerpts
+       - ALL text in source language
+       - ALL section headers in source language
+       - ALL subsection titles in source language
+       - Do NOT mix languages - use ONE language only
+    2. LENGTH: Write AT LEAST {target_words} words - this is NOT optional. Count carefully.
+    3. STRUCTURE: Include multiple detailed sections (at least 5-7 major sections)
+    4. DEPTH: Each section should be comprehensive with multiple paragraphs
+    5. DETAIL: Provide extensive analysis, examples, and explanations
+    6. EVIDENCE: Use many excerpts and cite them properly
+    7. ACADEMIC QUALITY: Maintain rigorous scholarly standards throughout
+
+    Structure your chapter with sections (all in source language):
+    - Introduction section (200+ words)
+    - Multiple content sections with subsections (400+ words each)
+    - Conclusion section (200+ words)
+    - Total: {target_words}+ words
+
+    CRITICAL: Match the source language COMPLETELY - do NOT mix languages.
+    Every single word, header, and title must be in the detected source language.
+
+    REMEMBER: You MUST write at least {target_words} words. Do NOT stop early.
+
+# Chapter outline generation
+chapter_outline:
+  system: |
+    You are an expert at structuring academic content.
+
+    IMPORTANT: Detect the language of the source content and create the outline in the SAME language.
+
+  user: |
+    Theme: {theme}
+
+    Available content:
+    {chunks}
+
+    Create a detailed outline for a book chapter on this theme, including:
+    - Main sections and subsections
+    - Key points to cover in each section
+    - Logical flow of ideas
+
+    IMPORTANT: Write the outline in the SAME language as the content above.
+
+# Chapter sequencing/ordering
+chapter_sequencing:
+  system: |
+    You are an expert at organizing academic book structure.
+
+    IMPORTANT: Detect the language of the theme names and respond in the SAME language.
+
+  user: |
+    I have the following themes for book chapters:
+    {themes}
+
+    Suggest a logical order for these chapters that creates a coherent narrative flow.
+    Explain briefly why this ordering makes sense.
+
+    IMPORTANT: Respond in the SAME language as the theme names above.
+
+    Format your response as:
+    1. [Theme name] - [Brief reason]
+    2. [Theme name] - [Brief reason]
+    ...
+
+# Introduction/transition text between chapters
+chapter_transition:
+  system: |
+    You are an expert academic writer.
+
+  user: |
+    Previous chapter theme: {previous_theme}
+    Next chapter theme: {next_theme}
+
+    Write a brief transitional paragraph (3-4 sentences) that connects these two chapters,
+    helping the reader understand how they relate to each other.
+
+# Abstract/summary generation
+document_summary:
+  system: |
+    You are an expert at writing academic abstracts and summaries.
+
+  user: |
+    Document excerpts:
+    {chunks}
+
+    Write a comprehensive abstract (150-200 words) that summarizes the main ideas,
+    arguments, and conclusions of this document.
+
+# Query expansion for better retrieval
+query_expansion:
+  system: |
+    You are a search query expert helping improve document retrieval.
+
+  user: |
+    Original query: {query}
+
+    Generate 3-5 alternative phrasings or related terms that would help find relevant documents.
+    Focus on synonyms, related concepts, and alternative formulations.
+
+    List them as:
+    - [Alternative 1]
+    - [Alternative 2]
+    ...
+
+# Duplicate content detection
+duplicate_check:
+  system: |
+    You are an expert at identifying duplicate or highly similar content.
+
+  user: |
+    Text A:
+    {text_a}
+
+    Text B:
+    {text_b}
+
+    Analyze if these texts are duplicates or substantially similar.
+    Respond with:
+    - Similarity: [High/Medium/Low]
+    - Explanation: [Brief explanation]
+    - Recommendation: [Keep both/Remove one/Merge]

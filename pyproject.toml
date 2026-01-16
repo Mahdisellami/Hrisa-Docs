@@ -1,0 +1,123 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hrisa-docs"
+version = "0.1.0"
+description = "Hrisa Docs - Desktop application for processing and synthesizing PDF documents using RAG with local LLMs"
+authors = [
+    {name = "Mahdi Sellami"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    # GUI
+    "PyQt6>=6.6.0",
+
+    # PDF Processing
+    "PyMuPDF>=1.23.0",
+
+    # Vector DB & Embeddings
+    "chromadb>=0.4.22",
+    "sentence-transformers>=2.3.0",
+
+    # LLM Integration
+    "langchain>=0.1.0",
+    "langchain-community>=0.0.10",
+    "ollama>=0.1.6",
+
+    # Text Processing
+    "spacy>=3.7.0",
+
+    # Data Models
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "numpy>=1.24.0",
+    "keyring>=24.0.0",  # OS keyring for secure credential storage
+
+    # HTTP & Web Fetching
+    "requests>=2.28.0",
+    "beautifulsoup4>=4.11.0",
+    "google-api-python-client>=2.0.0",  # For Google Custom Search
+
+    # Output Formatting
+    "python-docx>=1.1.0",
+    "markdown>=3.5.0",
+
+    # Progress & CLI
+    "tqdm>=4.66.0",
+    "rich>=13.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-qt>=4.3.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.0",
+    "ruff>=0.1.9",
+    "mypy>=1.8.0",
+]
+
+packaging = [
+    "pyinstaller>=6.3.0",
+]
+
+testing = [
+    "reportlab>=4.0.0",
+]
+
+[project.scripts]
+docprocessor = "docprocessor.gui.main_window:main"
+# docprocessor-cli = "docprocessor.cli:main"  # TODO: Add when CLI is implemented
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = [
+    "E501",  # Line too long (handled by black)
+    "F841",  # Local variable assigned but never used (common in tests)
+    "F821",  # Undefined name (will fix separately)
+    "F601",  # Dictionary key repeated (will fix with code refactor)
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src/docprocessor --cov-report=html --cov-report=term"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true

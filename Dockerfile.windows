@@ -1,0 +1,57 @@
+# Dockerfile for building Hrisa Docs for Windows using Wine
+# This allows cross-compilation of Windows executables from Linux
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV WINEARCH=win64
+ENV WINEPREFIX=/root/.wine
+
+# Install system dependencies including Wine
+RUN dpkg --add-architecture i386 && \
+    apt-get update && apt-get install -y \
+    wget \
+    software-properties-common \
+    gnupg2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add Wine repository
+RUN wget -nc https://dl.winehq.org/wine-builds/winehq.key && \
+    apt-key add winehq.key && \
+    add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ jammy main'
+
+# Install Wine and dependencies
+RUN apt-get update && apt-get install -y \
+    winehq-stable \
+    winetricks \
+    cabextract \
+    xvfb \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python in Wine
+RUN mkdir -p /tmp/python-installer && \
+    cd /tmp/python-installer && \
+    wget https://www.python.org/ftp/python/3.10.11/python-3.10.11-amd64.exe && \
+    xvfb-run wine python-3.10.11-amd64.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 && \
+    rm -rf /tmp/python-installer
+
+# Wait for Wine to settle
+RUN sleep 10
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY . /app
+
+# Clean any previous build artifacts
+RUN rm -rf /app/build /app/dist/*.exe /app/dist/*.spec
+
+# Install Python dependencies in Wine
+RUN xvfb-run wine python -m pip install --upgrade pip setuptools wheel && \
+    xvfb-run wine python -m pip install pyinstaller && \
+    xvfb-run wine python -m pip install -e .
+
+# Build script will be run as a command
+CMD ["xvfb-run", "wine", "python", "scripts/build_windows.py"]

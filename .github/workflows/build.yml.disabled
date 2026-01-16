@@ -1,0 +1,273 @@
+name: Build Hrisa Docs
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-macos:
+    name: Build macOS Application
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[packaging]"
+
+      - name: Install create-dmg
+        run: |
+          brew install create-dmg
+
+      - name: Build application
+        run: |
+          python scripts/build_macos.py
+
+      - name: Verify build artifacts
+        run: |
+          ls -lh dist/
+          if [ ! -d "dist/Hrisa Docs.app" ]; then
+            echo "Error: App bundle not found"
+            exit 1
+          fi
+          if [ ! -f "dist/HrisaDocs-0.1.0-macOS.dmg" ]; then
+            echo "Error: DMG not found"
+            exit 1
+          fi
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: HrisaDocs-macOS-app
+          path: dist/Hrisa Docs.app
+          retention-days: 30
+
+      - name: Upload DMG installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: HrisaDocs-macOS-dmg
+          path: dist/HrisaDocs-*.dmg
+          retention-days: 90
+
+      - name: Create checksum
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          cd dist
+          shasum -a 256 HrisaDocs-*.dmg > HrisaDocs-macOS.sha256
+          cat HrisaDocs-macOS.sha256
+
+      - name: Upload to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/HrisaDocs-*.dmg
+            dist/HrisaDocs-macOS.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-windows:
+    name: Build Windows Application
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[packaging]"
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+
+      - name: Build application
+        run: |
+          python scripts/build_windows.py
+
+      - name: Verify build artifacts
+        run: |
+          dir dist\
+          if (-not (Test-Path "dist\HrisaDocs.exe")) {
+            Write-Error "Error: Executable not found"
+            exit 1
+          }
+        shell: pwsh
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: HrisaDocs-Windows-exe
+          path: dist/HrisaDocs.exe
+          retention-days: 30
+
+      - name: Upload installer
+        if: hashFiles('dist/HrisaDocs-*-Setup.exe') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: HrisaDocs-Windows-installer
+          path: dist/HrisaDocs-*-Setup.exe
+          retention-days: 90
+
+      - name: Create checksum
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          cd dist
+          Get-FileHash HrisaDocs-*-Setup.exe -Algorithm SHA256 |
+            Select-Object @{Name='Hash';Expression={$_.Hash}}, @{Name='File';Expression={Split-Path $_.Path -Leaf}} |
+            Format-Table -HideTableHeaders |
+            Out-File HrisaDocs-Windows.sha256
+          Get-Content HrisaDocs-Windows.sha256
+        shell: pwsh
+
+      - name: Upload to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/HrisaDocs-*-Setup.exe
+            dist/HrisaDocs-Windows.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Run Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.11']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v -m "not requires_ollama" --cov=docprocessor --cov-report=xml
+        env:
+          QT_QPA_PLATFORM: offscreen
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: ${{ matrix.os }}
+          name: codecov-${{ matrix.os }}
+
+  lint:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install black ruff mypy
+
+      - name: Check formatting with black
+        run: |
+          black --check src/ tests/
+
+      - name: Lint with ruff
+        run: |
+          ruff check src/ tests/
+
+      - name: Type check with mypy
+        continue-on-error: true  # Don't fail on type errors (yet)
+        run: |
+          mypy src/ --ignore-missing-imports
+
+  create-release-notes:
+    name: Create Release Notes
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-macos, build-windows, test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "## What's Changed" > release_notes.md
+          echo "" >> release_notes.md
+          git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"- %s (%h)" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Installation" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### macOS" >> release_notes.md
+          echo "1. Download \`HrisaDocs-0.1.0-macOS.dmg\`" >> release_notes.md
+          echo "2. Open the DMG and drag app to Applications" >> release_notes.md
+          echo "3. Right-click app → Open (first time only)" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Windows" >> release_notes.md
+          echo "1. Download \`HrisaDocs-0.1.0-Setup.exe\`" >> release_notes.md
+          echo "2. Run the installer" >> release_notes.md
+          echo "3. Follow installation wizard" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Requirements" >> release_notes.md
+          echo "- [Ollama](https://ollama.ai/download) (required)" >> release_notes.md
+          echo "- [Pandoc](https://pandoc.org/installing.html) (optional, for PDF export)" >> release_notes.md
+          echo "- LaTeX distribution (optional, for PDF export)" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "See [Installation Guide](https://github.com/${{ github.repository }}/blob/main/docs/INSTALLATION.md) for details." >> release_notes.md
+
+      - name: Update release with notes
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release_notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
