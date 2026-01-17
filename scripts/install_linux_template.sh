@@ -76,17 +76,39 @@ echo "Checking dependencies..."
 echo "================================"
 echo ""
 
+# Check curl (needed for Ollama installation)
+if ! command -v curl &> /dev/null; then
+    echo "❌ curl not found (required for Ollama installation)"
+    read -p "Install curl? [y/N]: " response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        if command -v apt-get &> /dev/null; then
+            apt-get update && apt-get install -y curl
+        elif command -v yum &> /dev/null; then
+            yum install -y curl
+        else
+            echo "⚠️  Could not install curl automatically"
+            echo "   Install manually: sudo apt install curl"
+        fi
+    fi
+fi
+
 # Check Ollama
 if ! command -v ollama &> /dev/null; then
     echo "❌ Ollama not found (required)"
-    echo "   Installing Ollama..."
-    curl -fsSL https://ollama.ai/install.sh | sh
+    if command -v curl &> /dev/null; then
+        echo "   Installing Ollama..."
+        curl -fsSL https://ollama.ai/install.sh | sh
 
-    if command -v ollama &> /dev/null; then
-        echo "✅ Ollama installed successfully"
+        if command -v ollama &> /dev/null; then
+            echo "✅ Ollama installed successfully"
+        else
+            echo "⚠️  Ollama installation failed"
+            echo "   Install manually: curl -fsSL https://ollama.ai/install.sh | sh"
+        fi
     else
-        echo "⚠️  Ollama installation failed"
-        echo "   Install manually: curl -fsSL https://ollama.ai/install.sh | sh"
+        echo "⚠️  Cannot install Ollama: curl is not available"
+        echo "   Install curl first: sudo apt install curl"
+        echo "   Then install Ollama: curl -fsSL https://ollama.ai/install.sh | sh"
     fi
 else
     echo "✅ Ollama is installed"

@@ -182,7 +182,7 @@ class LanguageManager:
             "format_all": "Tout (MD + DOCX + PDF)",
             # Dialogs
             "dialog_select_pdfs": "Sélectionner des documents",
-            "dialog_pdf_filter": "Tous les documents (*.pdf *.txt *.docx);;Fichiers PDF (*.pdf);;Fichiers texte (*.txt);;Documents Word (*.docx)",
+            "dialog_pdf_filter": "Tous les documents (*.pdf *.PDF *.txt *.TXT *.docx *.DOCX);;Fichiers PDF (*.pdf *.PDF);;Fichiers texte (*.txt *.TXT);;Documents Word (*.docx *.DOCX)",
             "dialog_no_documents": "Aucun document",
             "dialog_no_documents_msg": "Veuillez d'abord ajouter des documents.",
             "dialog_processing_complete": "Traitement terminé",
@@ -583,7 +583,7 @@ class LanguageManager:
             "format_all": "All (MD + DOCX + PDF)",
             # Dialogs
             "dialog_select_pdfs": "Select Documents",
-            "dialog_pdf_filter": "All Documents (*.pdf *.txt *.docx);;PDF Files (*.pdf);;Text Files (*.txt);;Word Documents (*.docx)",
+            "dialog_pdf_filter": "All Documents (*.pdf *.PDF *.txt *.TXT *.docx *.DOCX);;PDF Files (*.pdf *.PDF);;Text Files (*.txt *.TXT);;Word Documents (*.docx *.DOCX)",
             "dialog_no_documents": "No Documents",
             "dialog_no_documents_msg": "Please add some documents first.",
             "dialog_processing_complete": "Processing Complete",
@@ -978,7 +978,7 @@ class LanguageManager:
             "format_all": "(MD + DOCX + PDF) الكل",
             # Dialogs
             "dialog_select_pdfs": "اختر مستندات PDF",
-            "dialog_pdf_filter": "(*.pdf) ملفات PDF",
+            "dialog_pdf_filter": "(*.pdf *.PDF *.txt *.TXT *.docx *.DOCX) جميع المستندات;;(*.pdf *.PDF) ملفات PDF",
             "dialog_no_documents": "لا توجد مستندات",
             "dialog_no_documents_msg": ".الرجاء إضافة بعض المستندات أولاً",
             "dialog_processing_complete": "اكتملت المعالجة",

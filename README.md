@@ -138,6 +138,7 @@ Download the pre-built installer for your platform from the [Releases](../../rel
 - Ubuntu 22.04 or later
 - Debian 11 or later
 - Other Linux distributions with compatible glibc
+- `curl` package (required for Ollama installation: `sudo apt install curl`)
 
 #### Windows
 
@@ -192,19 +193,33 @@ Ollama runs the local AI models that power document synthesis and theme labeling
 
 **Linux (Ubuntu/Debian):**
 
-1. **Install via script**:
+1. **Install curl** (if not already installed):
+   ```bash
+   sudo apt update
+   sudo apt install curl -y
+   ```
+2. **Install Ollama via script**:
    ```bash
    curl -fsSL https://ollama.ai/install.sh | sh
    ```
-2. **Verify**:
+3. **Start Ollama service**:
+   ```bash
+   # Start in background
+   ollama serve &
+
+   # Or use systemd (if available)
+   sudo systemctl start ollama
+   sudo systemctl enable ollama  # Auto-start on boot
+   ```
+4. **Verify**:
    ```bash
    ollama --version
    ```
-3. **Pull Model**:
+5. **Pull Model**:
    ```bash
    ollama pull llama3.1:latest
    ```
-   *(Downloads ~4.8 GB model, takes a few minutes)*
+   *(Downloads ~4.8 GB model, takes 5-10 minutes)*
 
 **Test Ollama:**
 

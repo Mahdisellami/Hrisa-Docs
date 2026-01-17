@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, QTimer, pyqtSignal
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -97,6 +97,39 @@ class ImportWorker(QThread):
             self.error.emit(str(e))
 
 
+class CredentialsLoaderWorker(QThread):
+    """Worker thread for loading credentials from keyring without blocking UI."""
+
+    credentials_loaded = pyqtSignal(str, str)  # api_key, engine_id
+    loading_failed = pyqtSignal()  # No credentials or error
+
+    def run(self):
+        """Load credentials in background thread."""
+        try:
+            from docprocessor.utils.credentials_manager import get_credentials_manager
+
+            creds_manager = get_credentials_manager()
+
+            # Check if keyring is available (can block, but we're in background thread)
+            if not creds_manager.is_keyring_available():
+                logger.debug("Keyring not available")
+                self.loading_failed.emit()
+                return
+
+            # Load credentials (can block, but we're in background thread)
+            credentials = creds_manager.load_google_credentials()
+
+            if credentials:
+                api_key, engine_id = credentials
+                self.credentials_loaded.emit(api_key, engine_id)
+                logger.info("Loaded saved Google API credentials")
+            else:
+                self.loading_failed.emit()
+        except Exception as e:
+            logger.warning(f"Could not load saved credentials: {e}")
+            self.loading_failed.emit()
+
+
 class SearchImportDialog(QDialog):
     """Dialog for searching and importing documents from research sources."""
 
@@ -108,6 +141,7 @@ class SearchImportDialog(QDialog):
         self.lang_manager = get_language_manager()
         self.search_worker = None
         self.import_worker = None
+        self.credentials_loader_worker = None
         self.search_results = []  # List of SearchResult objects
 
         self.setWindowTitle(
@@ -118,7 +152,7 @@ class SearchImportDialog(QDialog):
 
         self.setup_ui()
 
-        # Load saved credentials if available
+        # Start background thread to load credentials (won't block UI)
         self.load_saved_credentials()
 
     def setup_ui(self):
@@ -721,18 +755,37 @@ class SearchImportDialog(QDialog):
         )
 
     def load_saved_credentials(self):
-        """Load saved credentials from keyring if available."""
-        from docprocessor.utils.credentials_manager import get_credentials_manager
+        """Load saved credentials from keyring using background thread.
 
-        creds_manager = get_credentials_manager()
-        credentials = creds_manager.load_google_credentials()
+        This method starts a background thread to avoid blocking the UI,
+        especially on Linux where keyring access may require user interaction
+        or may not be available at all.
+        """
+        # Clean up any existing worker
+        if self.credentials_loader_worker is not None:
+            self.credentials_loader_worker.quit()
+            self.credentials_loader_worker.wait()
 
-        if credentials:
-            api_key, engine_id = credentials
-            self.api_key_input.setText(api_key)
-            self.search_engine_id_input.setText(engine_id)
-            self.remember_credentials_checkbox.setChecked(True)
-            logger.info("Loaded saved Google API credentials")
+        # Create and start background worker
+        self.credentials_loader_worker = CredentialsLoaderWorker()
+        self.credentials_loader_worker.credentials_loaded.connect(self.on_credentials_loaded)
+        self.credentials_loader_worker.loading_failed.connect(self.on_credentials_loading_failed)
+        self.credentials_loader_worker.finished.connect(
+            lambda: self.credentials_loader_worker.deleteLater()
+        )
+        self.credentials_loader_worker.start()
+        logger.debug("Started background thread to load credentials")
+
+    def on_credentials_loaded(self, api_key: str, engine_id: str):
+        """Handle successfully loaded credentials from background thread."""
+        self.api_key_input.setText(api_key)
+        self.search_engine_id_input.setText(engine_id)
+        self.remember_credentials_checkbox.setChecked(True)
+        logger.debug("Applied loaded credentials to UI")
+
+    def on_credentials_loading_failed(self):
+        """Handle failed credential loading (no credentials or error)."""
+        logger.debug("No saved credentials available or keyring unavailable")
 
     def clear_credentials(self):
         """Clear saved credentials from keyring."""

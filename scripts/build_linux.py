@@ -134,20 +134,10 @@ a = Analysis(
     excludes=[
         # GUI frameworks we don't use
         'tkinter', 'tk', '_tkinter',
-        # Testing frameworks
-        'pytest', 'unittest', 'nose', 'doctest', 'coverage',
-        # Development tools
-        'IPython', 'jupyter', 'notebook', 'nbconvert', 'ipykernel',
-        # Documentation
-        'sphinx', 'docutils',
-        # Large scientific packages (exclude if not critical)
-        'matplotlib', 'scipy', 'pandas',
-        # Other unused
-        'sqlite3',  # ChromaDB uses its own SQLite
-        # Compiler/build tools
-        'setuptools', 'pip', 'wheel',
-        # Large ML frameworks we don't directly import
-        'tensorflow', 'torch',
+        # Development/testing tools (safe to exclude)
+        'pytest', 'IPython', 'jupyter',
+        # TensorFlow (we use PyTorch)
+        'tensorflow',
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
